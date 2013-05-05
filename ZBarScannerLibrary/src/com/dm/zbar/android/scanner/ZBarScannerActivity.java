@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 import net.sourceforge.zbar.Config;
 import net.sourceforge.zbar.Image;
 import net.sourceforge.zbar.ImageScanner;
@@ -17,12 +18,13 @@ import net.sourceforge.zbar.SymbolSet;
 
 public class ZBarScannerActivity extends Activity implements Camera.PreviewCallback, ZBarConstants {
 
-    private static final String TAG = "ZBarScannerActivity";
-    private CameraPreview mPreview;
-    private Camera mCamera;
-    private ImageScanner mScanner;
-    private Handler mAutoFocusHandler;
-    private boolean mPreviewing = true;
+    @SuppressWarnings("unused")
+	private static final String TAG = "ZBarScannerActivity";
+    protected CameraPreview mPreview;
+    protected Camera mCamera;
+    protected ImageScanner mScanner;
+    protected Handler mAutoFocusHandler;
+    protected boolean mPreviewing = true;
 
     static {
         System.loadLibrary("iconv");
@@ -142,6 +144,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
                     dataIntent.putExtra(SCAN_RESULT, symData);
                     dataIntent.putExtra(SCAN_RESULT_TYPE, sym.getType());
                     setResult(Activity.RESULT_OK, dataIntent);
+                    Toast.makeText(this.getApplicationContext(), "Scanned code "+ symData, Toast.LENGTH_LONG).show();
                     finish();
                     break;
                 }
@@ -159,7 +162,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     // Mimic continuous auto-focusing
     Camera.AutoFocusCallback autoFocusCB = new Camera.AutoFocusCallback() {
         public void onAutoFocus(boolean success, Camera camera) {
-            mAutoFocusHandler.postDelayed(doAutoFocus, 1000);
+            mAutoFocusHandler.postDelayed(doAutoFocus, 500);
         }
     };
 }
