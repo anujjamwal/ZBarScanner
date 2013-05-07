@@ -80,7 +80,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
             cancelRequest();
             return;
         }
-
+        mCamera.setDisplayOrientation(90);
         mPreview.setCamera(mCamera);
         mPreview.showSurfaceView();
 
@@ -161,8 +161,9 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
 
     // Mimic continuous auto-focusing
     Camera.AutoFocusCallback autoFocusCB = new Camera.AutoFocusCallback() {
+    	
         public void onAutoFocus(boolean success, Camera camera) {
-            mAutoFocusHandler.postDelayed(doAutoFocus, 500);
+            mAutoFocusHandler.postDelayed(doAutoFocus, 1000);
         }
     };
 }

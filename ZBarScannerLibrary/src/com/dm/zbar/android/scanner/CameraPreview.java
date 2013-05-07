@@ -28,10 +28,11 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
     CameraPreview(Context context, PreviewCallback previewCallback, AutoFocusCallback autoFocusCb) {
         super(context);
-
+        
         mPreviewCallback = previewCallback;
         mAutoFocusCallback = autoFocusCb;
         mSurfaceView = new SurfaceView(context);
+        
         addView(mSurfaceView);
 
         // Install a SurfaceHolder.Callback so we get notified when the
@@ -39,6 +40,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        
     }
 
     public void setCamera(Camera camera) {
@@ -57,7 +59,6 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
         final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
         final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         setMeasuredDimension(width, height);
-        Log.v("iMeeting", "Size on Measure"+width+", "+height);
 
         if (mSupportedPreviewSizes != null) {
             mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
@@ -68,27 +69,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         if (changed && getChildCount() > 0) {
             final View child = getChildAt(0);
-
-            final int width = r - l;
-            final int height = b - t;
-
-            int previewWidth = width;
-            int previewHeight = height;
-            if (mPreviewSize != null) {
-                previewWidth = mPreviewSize.width;
-                previewHeight = mPreviewSize.height;
-            }
-
-            // Center the child SurfaceView within the parent.
-            if (width * previewHeight > height * previewWidth) {
-                final int scaledChildWidth = previewWidth * height / previewHeight;
-                child.layout((width - scaledChildWidth) / 2, 0,
-                        (width + scaledChildWidth) / 2, height);
-            } else {
-                final int scaledChildHeight = previewHeight * width / previewWidth;
-                child.layout(0, (height - scaledChildHeight) / 2,
-                        width, (height + scaledChildHeight) / 2);
-            }
+            child.layout(0, 0, r-l, b-t);
         }
     }
 
@@ -122,44 +103,36 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 
     private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
-        final double ASPECT_TOLERANCE = 0.05;  
+    	final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) w / h;
         if (sizes == null) return null;
-        int i = 0, minIndex = 0;
-        double minRatio ;
+
         Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
 
         int targetHeight = h;
 
         // Try to find an size match aspect ratio and size
-        minRatio = (double) sizes.get(0).width / sizes.get(0).height;
         for (Size size : sizes) {
             double ratio = (double) size.width / size.height;
-//            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-//            if (Math.abs(size.height - targetHeight) < minDiff) {
-//                optimalSize = size;
-//                minDiff = Math.abs(size.height - targetHeight);
-//            }
-            if(minRatio > ratio) {
-            	minRatio = ratio;
-            	minIndex = i;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
             }
-            i++;
         }
-        Log.v("iMeeting", "in getOptimlSize new algo"); 
-//        // Cannot find the one match the aspect ratio, ignore the requirement
-//        if (optimalSize == null) {
-//        	Log.v("iMeeting", "cannot find match");
-//            minDiff = Double.MAX_VALUE;
-//            for (Size size : sizes) {
-//                if (Math.abs(size.height - targetHeight) < minDiff) {
-//                    optimalSize = size;
-//                    minDiff = Math.abs(size.height - targetHeight);
-//                }
-//            }
-//        }
-        return sizes.get(minIndex);
+
+        // Cannot find the one match the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -167,16 +140,14 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
           // preview surface does not exist
           return;
         }
-
+        
         if (mCamera != null) {
         	
-        	Log.v("iMeeting", "Setting size"); 
-        	Log.v("iMeeting", " size "+mPreviewSize.width+","+mPreviewSize.height);
             // Now that the size is known, set up the camera parameters and begin
             // the preview.
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-
+            
             requestLayout();
 
             mCamera.setParameters(parameters);
