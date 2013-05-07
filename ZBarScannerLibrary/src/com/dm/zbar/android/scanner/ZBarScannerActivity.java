@@ -163,7 +163,7 @@ public class ZBarScannerActivity extends Activity implements Camera.PreviewCallb
     Camera.AutoFocusCallback autoFocusCB = new Camera.AutoFocusCallback() {
     	
         public void onAutoFocus(boolean success, Camera camera) {
-            mAutoFocusHandler.postDelayed(doAutoFocus, 1000);
+            mAutoFocusHandler.postDelayed(doAutoFocus, 1500);
         }
     };
 }

@@ -147,7 +147,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             // the preview.
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             requestLayout();
 
             mCamera.setParameters(parameters);
