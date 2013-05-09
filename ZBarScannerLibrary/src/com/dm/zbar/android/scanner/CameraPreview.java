@@ -1,5 +1,8 @@
 package com.dm.zbar.android.scanner;
 
+import java.io.IOException;
+import java.util.List;
+
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -10,10 +13,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     private final String TAG = "CameraPreview";
@@ -26,7 +25,8 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
     PreviewCallback mPreviewCallback;
     AutoFocusCallback mAutoFocusCallback;
 
-    CameraPreview(Context context, PreviewCallback previewCallback, AutoFocusCallback autoFocusCb) {
+    @SuppressWarnings("deprecation")
+	CameraPreview(Context context, PreviewCallback previewCallback, AutoFocusCallback autoFocusCb) {
         super(context);
         
         mPreviewCallback = previewCallback;
@@ -147,7 +147,7 @@ class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
             // the preview.
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+//            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             requestLayout();
 
             mCamera.setParameters(parameters);
